@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 
 const navStyle = {
-    color: '#FF7900',
+  color: '#FF7900',
 };
 
 const brandStyle = {
-    ...navStyle,
-    fontSize: '1.5rem',
+  ...navStyle,
+  fontSize: '1.5rem',
 };
 
 const AppNavbar: React.FC = () => {
@@ -21,7 +21,6 @@ const AppNavbar: React.FC = () => {
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Accueil</Nav.Link>
             <Nav.Link as={Link} to="/recherche">Recherche</Nav.Link>
-            <Nav.Link as={Link} to="/about">À propos</Nav.Link>
             <NavDropdown title="Films (tests)" id="films-dropdown">
               <NavDropdown.Item as={Link} to="/film/680">Pulp Fiction</NavDropdown.Item>
             </NavDropdown>
@@ -35,6 +34,7 @@ const AppNavbar: React.FC = () => {
               <NavDropdown.Item as={Link} to="/categorie/35">Comédie</NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/categorie/18">Drame</NavDropdown.Item>
             </NavDropdown>
+            <Nav.Link as={Link} to="/about">À propos</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

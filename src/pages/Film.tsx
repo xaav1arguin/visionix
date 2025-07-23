@@ -58,7 +58,7 @@ const Film: React.FC = () => {
           <div className="mb-2">
             <Badge bg="info" className="me-2">{movieDetails.releaseDate}</Badge>
             <Badge bg="secondary" className="me-2">{movieDetails.runtime} min</Badge>
-            <Badge bg="warning" className="me-2">{movieDetails.voteAverage} / 10</Badge>
+            <Badge bg="warning" className="me-2">{movieDetails.voteAverage}/10</Badge>
             <div className="mb-2">
               {/* autres badges (date, durée, note, etc.) */}
               {movieDetails.genres.map(g => (
