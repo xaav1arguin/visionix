@@ -31,7 +31,11 @@ const Film: React.FC = () => {
       <Row>
         <Col md={4}>
           <Card>
-            <Card.Img src={movieDetails.posterUrl ?? '/placeholder.jpg'} alt={movieDetails.title} />
+            <Card.Img
+              variant="top"
+              src={movieDetails.posterUrl || '/placeholder.png'}
+              alt={movieDetails.title || 'Affiche du film'}
+            />
           </Card>
           {movieDetails.streamingProviders.length > 0 && (
             <Card className="mt-3">
@@ -58,7 +62,7 @@ const Film: React.FC = () => {
           <div className="mb-2">
             <Badge bg="info" className="me-2">{movieDetails.releaseDate}</Badge>
             <Badge bg="secondary" className="me-2">{movieDetails.runtime} min</Badge>
-            <Badge bg="warning" className="me-2">{movieDetails.voteAverage}/10</Badge>
+            <Badge bg="warning" className="me-2">{movieDetails.voteAverage} / 10</Badge>
             <div className="mb-2">
               {/* autres badges (date, durée, note, etc.) */}
               {movieDetails.genres.map(g => (
@@ -91,7 +95,7 @@ const Film: React.FC = () => {
             {movieDetails.imdbUrl && (
               <li>
                 <a href={movieDetails.imdbUrl} target="_blank" rel="noopener noreferrer">
-                  IMDB
+                  IMDb
                 </a>
               </li>
             )}
@@ -105,7 +109,8 @@ const Film: React.FC = () => {
                   <Card className="h-100">
                     <Card.Img
                       variant="top"
-                      src={actor.photoUrl ?? '/profile_placeholder.png'}
+                      className="img-fluid"
+                      src={actor.photoUrl || '/portrait.png'}
                       alt={actor.name}
                     />
                     <Card.Body>
