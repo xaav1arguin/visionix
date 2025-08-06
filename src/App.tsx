@@ -8,12 +8,14 @@ import Categorie from './pages/Categorie';
 import Acteur from './pages/Acteur';
 import Recherche from './pages/Recherche';
 import About from './pages/About';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 const App: React.FC = () => {
   return (
     <>
       <AppNavbar />
-     <div style={{ minHeight: '100vh' }}>
+      <div style={{ minHeight: '100vh' }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/film/:id" element={<Film />} />

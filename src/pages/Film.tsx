@@ -1,147 +1,278 @@
-import React from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useMovieDetails } from '../hooks/useMovieDetails';
-import { Container, Row, Col, Spinner, Alert, Card, Badge } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Container, Card, Button } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import {
+  fetchTMDBMovie,
+  fetchTMDBCredits,
+  fetchTMDBWatchProviders,
+} from '../api/tmdb';
+import type { TMDBMovie } from '../types/TMDBMovie';
+import type { TMDBCredits } from '../types/TMDBCredits';
+import type { TMDBWatchProviders } from '../types/TMDBWatchProviders';
+
+const streamingSitesMap: Record<string, string> = {
+  Netflix: 'https://www.netflix.com/search?q=',
+  'Prime Video': 'https://www.amazon.com/s?k=',
+  'Disney Plus': 'https://www.disneyplus.com/search/',
+  Hulu: 'https://www.hulu.com/search?q=',
+  'Apple TV Plus': 'https://tv.apple.com/search/',
+  'Google Play Movies': 'https://play.google.com/store/search?q=',
+  // ajoute d'autres si besoin
+};
 
 const Film: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { movieDetails, loading, error } = useMovieDetails(id);
+  const [movie, setMovie] = useState<TMDBMovie | null>(null);
+  const [cast, setCast] = useState<TMDBCredits['cast']>([]);
+  const [watchProviders, setWatchProviders] = useState<TMDBWatchProviders | null>(null);
 
-  if (loading) {
-    return (
-      <Container className="py-5 text-center">
-        <Spinner animation="border" role="status" />
-        <div>Chargement du film...</div>
-      </Container>
-    );
+  useEffect(() => {
+    if (!id) return;
+
+    const loadData = async () => {
+      try {
+        const [movieData, creditsData, providersData] = await Promise.all([
+          fetchTMDBMovie(id),
+          fetchTMDBCredits(id),
+          fetchTMDBWatchProviders(id),
+        ]);
+        setMovie(movieData);
+        setCast(creditsData.cast.slice(0, 10));
+        setWatchProviders(providersData);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données TMDB :', error);
+      }
+    };
+
+    loadData();
+  }, [id]);
+
+  if (!movie) return null;
+
+  // Calcul rating sur 5 étoiles
+  const rating = movie.vote_average / 2;
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    if (i <= Math.floor(rating)) {
+      stars.push(
+        <i key={i} className="bi bi-star-fill" style={{ color: '#ff7900' }} />
+      );
+    } else if (i - rating < 1) {
+      stars.push(
+        <i key={i} className="bi bi-star-half" style={{ color: '#ff7900' }} />
+      );
+    } else {
+      stars.push(<i key={i} className="bi bi-star" style={{ color: '#ff7900' }} />);
+    }
   }
 
-  if (error) {
-    return (
-      <Container className="py-5">
-        <Alert variant="danger">{error}</Alert>
-      </Container>
-    );
-  }
+  // Plateformes de streaming
+  const countryCode = 'FR'; // tu peux adapter dynamiquement
+  const providersForCountry = watchProviders?.results?.[countryCode];
+  const streamingProviders =
+    providersForCountry?.flatrate ||
+    providersForCountry?.rent ||
+    providersForCountry?.buy ||
+    [];
 
-  if (!movieDetails) return null;
+  const firstProvider = streamingProviders.length > 0 ? streamingProviders[0] : null;
+  const firstProviderName = firstProvider?.provider_name || '';
+  const directStreamingUrl = firstProviderName
+    ? streamingSitesMap[firstProviderName] + encodeURIComponent(movie.title)
+    : null;
 
   return (
-    <Container className="py-5">
-      <Row>
-        <Col md={4}>
-          <Card>
-            <Card.Img
-              variant="top"
-              src={movieDetails.posterUrl || '/placeholder.png'}
-              alt={movieDetails.title || 'Affiche du film'}
+    <>
+      {/* SECTION HERO */}
+      <div
+        style={{
+          position: 'relative',
+          height: '600px',
+          overflow: 'hidden',
+          color: 'white',
+        }}
+      >
+        <img
+          src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+          alt={movie.title}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 0,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.95))',
+            zIndex: 1,
+          }}
+        />
+        <Container
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+          }}
+        >
+          <h1
+            style={{
+              color: '#ff7900',
+              fontSize: '5rem',
+              fontWeight: 'bold',
+              fontFamily: 'Bebas Neue, sans-serif',
+              marginBottom: '0.3rem',
+            }}
+          >
+            {movie.title}
+          </h1>
+          <p
+            style={{
+              fontSize: '1rem',
+              marginBottom: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              flexWrap: 'wrap',
+            }}
+          >
+            {stars}
+            <span style={{ marginLeft: '8px' }}>{movie.vote_average.toFixed(1)}/10</span>
+            <span>· {new Date(movie.release_date).getFullYear()}</span>
+          </p>
+
+          {/* Durée avec ligne orange */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              margin: '20px 0',
+              maxWidth: '250px',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {movie.runtime} Min
+            </span>
+            <div
+              style={{
+                flexGrow: 1,
+                height: '3px',
+                backgroundColor: '#ff7900',
+                borderRadius: '2px',
+                alignSelf: 'center',
+              }}
             />
-          </Card>
-          {movieDetails.streamingProviders.length > 0 && (
-            <Card className="mt-3">
-              <Card.Body>
-                <h5>Disponible sur :</h5>
-                <div>
-                  {movieDetails.streamingProviders.map(p => (
-                    <img
-                      key={p.name}
-                      src={p.logoUrl}
-                      alt={p.name}
-                      title={p.name}
-                      style={{ height: 32, marginRight: 8 }}
-                    />
-                  ))}
-                </div>
-              </Card.Body>
-            </Card>
-          )}
-        </Col>
-        <Col md={8}>
-          <h2>{movieDetails.title} <small>({movieDetails.originalTitle})</small></h2>
-          {movieDetails.tagline && <p className="fst-italic">{movieDetails.tagline}</p>}
-          <div className="mb-2">
-            <Badge bg="info" className="me-2">{movieDetails.releaseDate}</Badge>
-            <Badge bg="secondary" className="me-2">{movieDetails.runtime} min</Badge>
-            <Badge bg="warning" className="me-2">{movieDetails.voteAverage} / 10</Badge>
-            <div className="mb-2">
-              {/* autres badges (date, durée, note, etc.) */}
-              {movieDetails.genres.map(g => (
-                <Link
-                  key={g.id}
-                  to={`/categorie/${g.id}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <Badge bg="light" text="dark" className="me-1" style={{ cursor: 'pointer' }}>
-                    {g.name}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
           </div>
-          <p>{movieDetails.overview}</p>
-          <ul>
-            <li><strong>Pays :</strong> {movieDetails.productionCountries.join(', ')}</li>
-            <li><strong>Langue originale :</strong> {movieDetails.originalLanguage}</li>
-            <li><strong>Budget :</strong> {movieDetails.budget.toLocaleString()} $</li>
-            <li><strong>Recette :</strong> {movieDetails.revenue.toLocaleString()} $</li>
-            <li><strong>Réalisateur :</strong> {movieDetails.director?.name ?? 'Inconnu'}</li>
-            {movieDetails.homepage && (
-              <li>
-                <a href={movieDetails.homepage} target="_blank" rel="noopener noreferrer">
-                  Site officiel
-                </a>
-              </li>
-            )}
-            {movieDetails.imdbUrl && (
-              <li>
-                <a href={movieDetails.imdbUrl} target="_blank" rel="noopener noreferrer">
-                  IMDb
-                </a>
-              </li>
-            )}
-          </ul>
+          {/* Résumé */}
+          <p
+            style={{
+              marginTop: '10px',
+              fontSize: '1rem',
+              maxWidth: '800px',
+              lineHeight: '1.5',
+            }}
+          >
+            {movie.overview}
+          </p>
 
-          <h5>Casting principal</h5>
-          <Row>
-            {movieDetails.cast.map(actor => (
-              <Col key={actor.id} xs={6} md={4} lg={3} className="mb-3">
-                <Link to={`/acteur/${actor.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Card className="h-100">
-                    <Card.Img
-                      variant="top"
-                      className="img-fluid"
-                      src={actor.photoUrl || '/portrait.png'}
-                      alt={actor.name}
-                    />
-                    <Card.Body>
-                      <strong>{actor.name}</strong>
-                      <br />
-                      <small className="text-muted">{actor.character}</small>
-                    </Card.Body>
-                  </Card>
-                </Link>
-              </Col>
-            ))}
-          </Row>
+          {/* Bouton streaming */}
+          <a
+            href={`https://www.themoviedb.org/movie/${movie.id}/watch`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: '#ff7900',
+              color: 'white',
+              textDecoration: 'none',
+              padding: '6px 14px',
+              fontWeight: 'bold',
+              fontSize: '0.9rem',
+              marginTop: '15px',
+              borderRadius: '4px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 'fit-content',
+            }}
+          >
+            Regarder
+          </a>
+        </Container>
+      </div>
 
-          {movieDetails.trailerYoutubeId && (
-            <div className="my-4">
-              <h5>Bande-annonce</h5>
-              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-                <iframe
-                  title="Bande-annonce"
-                  src={`https://www.youtube.com/embed/${movieDetails.trailerYoutubeId}`}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  frameBorder="0"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
+      {/* SECTION ACTEURS */}
+      <div style={{ backgroundColor: 'black', padding: '50px 0' }}>
+        <Container>
+          <h3
+            style={{
+              marginBottom: '20px',
+              color: '#ff7900',
+              fontFamily: 'Bebas Neue, sans-serif',
+            }}
+          >
+            Casting principal :
+          </h3>
+
+          <div
+            style={{
+              display: 'flex',
+              overflowX: 'auto',
+              gap: '1rem',
+              paddingBottom: '1rem',
+            }}
+          >
+            {cast.map((actor) => (
+              <Card
+                key={actor.id}
+                bg="dark"
+                text="light"
+                style={{
+                  minWidth: '140px',
+                  maxWidth: '140px',
+                  flex: '0 0 auto',
+                  border: '1px solid #333',
+                }}
+              >
+                <Card.Img
+                  variant="top"
+                  src={
+                    actor.profile_path
+                      ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                      : '../public/placeholder.png'
+                  }
+                  style={{ height: '210px', objectFit: 'cover' }}
                 />
-              </div>
-            </div>
-          )}
-        </Col>
-      </Row>
-    </Container>
+                <Card.Body style={{ padding: '0.5rem' }}>
+                  <Card.Title style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>
+                    {actor.name}
+                  </Card.Title>
+                  <Card.Text style={{ fontSize: '0.75rem', color: '#bbb' }}>
+                    {actor.character}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
+        </Container>
+      </div>
+    </>
   );
 };
 

@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap';
 
 const Footer: React.FC = () => {
   return (
-    <footer style={{ backgroundColor: 'black', color: '#ff7900', padding: '20px 0' }}>
+    <footer style={{ backgroundColor: 'black', color: '#ff7900', padding: '20px 0', borderTop: '1px solid #ff7900', }}>
       <Container className="text-center">
         <p style={{ margin: 0, fontFamily: 'Bebas Neue, sans-serif' }}>
           &copy; {new Date().getFullYear()} VisioniX — Tous droits réservés
