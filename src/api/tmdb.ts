@@ -67,3 +67,7 @@ export function searchMovies(query: string, page: number = 1): Promise<TMDBSearc
   const url = `${BASE_URL}/search/movie?api_key=${API_KEY}&language=fr-FR&query=${encodeURIComponent(query)}&page=${page}`;
   return safeFetch<TMDBSearchMoviesResponse>(url);
 }
+export function fetchRecommendedMovies(id: string): Promise<TMDBMoviesByGenreResponse> {
+  const url = `${BASE_URL}/movie/${id}/recommendations?api_key=${API_KEY}&language=fr-FR`;
+  return safeFetch<TMDBMoviesByGenreResponse>(url);
+}

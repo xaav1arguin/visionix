@@ -11,24 +11,32 @@ type Movie = {
 
 type Props = {
   title: string;
-  category: string;
+  category?: string; // optionnel si on fournit movies direct
+  movies?: Movie[];
 };
 
-const MovieList: React.FC<Props> = ({ title, category }) => {
-  const [movies, setMovies] = useState<Movie[]>([]);
+const MovieList: React.FC<Props> = ({ title, category, movies: propMovies }) => {
+  const [movies, setMovies] = useState<Movie[]>(propMovies || []);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (propMovies) return; // ne rien faire si on a déjà la liste
+
+    if (!category) return;
+
     fetch(
-      `https://api.themoviedb.org/3/movie/${category}?api_key=34711b1563106ce68d5381f00d0d8ce1&language=fr-FR`
+      `https://api.themoviedb.org/3/movie/${category}?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=fr-FR`
     )
       .then((res) => res.json())
       .then((data) => setMovies(data.results || []));
-  }, [category]);
+  }, [category, propMovies]);
+
+  // ... reste inchangé
+
 
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
-      const scrollAmount = 300;
+      const scrollAmount = 600;
       carouselRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
