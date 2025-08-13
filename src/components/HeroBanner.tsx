@@ -25,11 +25,11 @@ const HeroBanner: React.FC = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setFade(false); // commence le fade-out
+      setFade(false);
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % movies.length);
-        setFade(true); // fade-in
-      }, 500); // délai entre le fade-out et le changement
+        setFade(true);
+      }, 500);
     }, 8000);
     return () => clearInterval(interval);
   }, [movies]);
@@ -50,7 +50,6 @@ const HeroBanner: React.FC = () => {
         justifyContent: 'flex-start',
       }}
     >
-      {/* Image fond avec fondu */}
       <div
         style={{
           position: 'absolute',
@@ -63,8 +62,6 @@ const HeroBanner: React.FC = () => {
           zIndex: 0,
         }}
       />
-
-      {/* Dégradé fondu */}
       <div
         style={{
           position: 'absolute',
@@ -73,8 +70,6 @@ const HeroBanner: React.FC = () => {
           zIndex: 1,
         }}
       />
-
-      {/* Contenu texte */}
       <div
         style={{
           position: 'relative',

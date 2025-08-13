@@ -11,7 +11,7 @@ type Movie = {
 
 type Props = {
   title: string;
-  category?: string; // optionnel si on fournit movies direct
+  category?: string;
   movies?: Movie[];
 };
 
@@ -20,7 +20,7 @@ const MovieList: React.FC<Props> = ({ title, category, movies: propMovies }) => 
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (propMovies) return; // ne rien faire si on a déjà la liste
+    if (propMovies) return;
 
     if (!category) return;
 
@@ -30,9 +30,6 @@ const MovieList: React.FC<Props> = ({ title, category, movies: propMovies }) => 
       .then((res) => res.json())
       .then((data) => setMovies(data.results || []));
   }, [category, propMovies]);
-
-  // ... reste inchangé
-
 
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
@@ -46,7 +43,6 @@ const MovieList: React.FC<Props> = ({ title, category, movies: propMovies }) => 
 
   return (
     <section style={{ marginBottom: '60px' }}>
-      {/* Ligne avec le titre et les flèches */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -65,8 +61,6 @@ const MovieList: React.FC<Props> = ({ title, category, movies: propMovies }) => 
           </button>
         </div>
       </div>
-
-      {/* Carrousel horizontal */}
       <div
         ref={carouselRef}
         style={{
