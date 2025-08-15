@@ -1,114 +1,141 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Spinner, Alert, Card } from 'react-bootstrap';
 import { useActorDetails } from '../hooks/useActorDetails';
+import type { ActorMovie } from '../types/ActorDetails';
 
 const Acteur: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { actorDetails, loading, error } = useActorDetails(id);
-  const [showFullBio, setShowFullBio] = React.useState(false);
+  const [showFullBio, setShowFullBio] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (loading) {
     return (
-      <Container className="py-5 text-center">
-        <Spinner animation="border" role="status" />
-        <div>Chargement de l’acteur...</div>
-      </Container>
+      <div style={{ backgroundColor: 'black', color: 'white', minHeight: '100vh' }}>
+        <Container className="py-5 text-center" style={{ maxWidth: '1100px', paddingLeft: '15px', paddingRight: '15px' }}>
+          <Spinner animation="border" />
+        </Container>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Container className="py-5">
-        <Alert variant="danger">{error}</Alert>
-      </Container>
+      <div style={{ backgroundColor: 'black', color: 'white', minHeight: '100vh' }}>
+        <Container className="py-5" style={{ maxWidth: '1100px', paddingLeft: '15px', paddingRight: '15px' }}>
+          <Alert variant="danger">{error}</Alert>
+        </Container>
+      </div>
     );
   }
 
-  if (!actorDetails) return null;
+  if (!actorDetails) {
+    return (
+      <div style={{ backgroundColor: 'black', color: 'white', minHeight: '100vh' }}>
+        <Container className="py-5" style={{ maxWidth: '1100px', paddingLeft: '15px', paddingRight: '15px' }}>
+          <Alert variant="warning">Acteur introuvable.</Alert>
+        </Container>
+      </div>
+    );
+  }
 
   return (
-    <Container className="py-5">
-      <Row>
-        <Col md={4}>
-          <Card>
-            <Card.Img
-              variant="top"
-              src={actorDetails.photoUrl || '/portrait.png'}
+    <div style={{ backgroundColor: 'black', color: 'white', minHeight: '100vh' }}>
+      <Container className="py-5" style={{ maxWidth: '1100px', paddingLeft: '15px', paddingRight: '15px' }}>
+        {/* Section infos acteur */}
+        <Row className="mb-4">
+          <Col md={4}>
+            <img
+              src={actorDetails.photoUrl}
               alt={actorDetails.name}
+              className="img-fluid rounded shadow-sm"
             />
-          </Card>
-        </Col>
-        <Col md={8}>
-          <h2>{actorDetails.name}</h2>
-
-          <p>
-            {actorDetails.biography
-              ? (
-                <>
-                  {showFullBio
-                    ? actorDetails.biography
-                    : `${actorDetails.biography.slice(0, 700)}...`}
-                  {actorDetails.biography.length > 700 && (
-                    <button
-                      onClick={() => setShowFullBio(!showFullBio)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#0d6efd',
-                        cursor: 'pointer',
-                        display: 'block',
-                        paddingLeft: 0,
-                        fontSize: '1em',
-                      }}
-                      aria-label={showFullBio ? 'Lire moins' : 'Lire plus'}
-                    >
-                      {showFullBio ? 'Lire moins' : 'Lire plus'}
-                    </button>
-                  )}
-                </>
-              )
-              : <em>Biographie non disponible pour cet acteur.</em>
-            }
-          </p>
-
-          <ul>
-            <li><strong>Date de naissance :</strong> {actorDetails.birthday}</li>
+          </Col>
+          <Col md={8}>
+            <h2>{actorDetails.name}</h2>
+            {actorDetails.birthday && (
+              <p style={{ marginBottom: '1rem', color: 'white' }}>
+                <strong style={{ color: '#ff7900' }}>Date de naissance :</strong> {actorDetails.birthday}
+              </p>
+            )}
             {actorDetails.placeOfBirth && (
-              <li><strong>Lieu de naissance :</strong> {actorDetails.placeOfBirth}</li>
+              <p style={{ marginBottom: '2rem', color: 'white' }}>
+                <strong style={{ color: '#ff7900' }}>Lieu de naissance :</strong> {actorDetails.placeOfBirth}
+              </p>
             )}
-            {actorDetails.imdbUrl && (
-              <li>
-                <a href={actorDetails.imdbUrl} target="_blank" rel="noopener noreferrer">
-                  Profil IMDb
-                </a>
-              </li>
+            {actorDetails.biography ? (
+              <p>
+                {showFullBio
+                  ? actorDetails.biography
+                  : `${actorDetails.biography.slice(0, 700)}...`}
+                {actorDetails.biography.length > 700 && (
+                  <button
+                    onClick={() => setShowFullBio(!showFullBio)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#ff7900',
+                      cursor: 'pointer',
+                      display: 'block',
+                      paddingLeft: 3,
+                      fontSize: '1em',
+                    }}
+                  >
+                    {showFullBio ? 'Lire moins' : 'Lire plus'}
+                  </button>
+                )}
+              </p>
+            ) : (
+              <p><em>Biographie non disponible pour cet acteur.</em></p>
             )}
-          </ul>
+          </Col>
+        </Row>
 
-          <h5 className="mt-4">Films notables</h5>
-          <Row>
-            {actorDetails.movies.map(movie => (
-              <Col key={movie.id} xs={6} md={4} lg={3} className="mb-3">
-                <Link to={`/film/${movie.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Card className="h-100">
-                    <Card.Img
-                      variant="top"
-                      src={movie.posterUrl || '/placeholder.png'}
-                      alt={movie.title}
-                    />
-                    <Card.Body>
-                      <strong>{movie.title}</strong><br />
-                      <small className="text-muted">{movie.character}</small>
-                    </Card.Body>
-                  </Card>
-                </Link>
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      </Row>
-    </Container>
+        {/* Section films notables */}
+        {actorDetails.movies.length > 0 && (
+          <>
+            <h3 className="mt-5 mb-3" style={{ color: '#ff7900', fontFamily: 'Bebas Neue, sans-serif', }}>
+              Films notables
+            </h3>
+
+            <Row className="flex-nowrap overflow-auto gx-3" style={{ paddingBottom: '1rem' }}>
+              {actorDetails.movies.map((movie: ActorMovie) => (
+                <Col key={movie.id} xs={6} sm={4} md={3} lg={2} className="mb-4 d-flex">
+                  <Link to={`/film/${movie.id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
+                    <Card
+                      className="h-100"
+                      bg="dark"
+                      text="light"
+                    >
+                      <Card.Img
+                        variant="top"
+                        src={movie.posterUrl}
+                        alt={movie.title}
+                        style={{ height: '210px', objectFit: 'cover' }}
+                      />
+                      <Card.Body style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <Card.Title style={{ fontSize: '0.9rem', minHeight: '2.5rem' }}>
+                          {movie.title}
+                        </Card.Title>
+                        {movie.character && (
+                          <Card.Text style={{ fontSize: '0.65rem', color: '#ccc' }}>
+                            Rôle : {movie.character}
+                          </Card.Text>
+                        )}
+                      </Card.Body>
+                    </Card>
+                  </Link>
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+      </Container>
+    </div>
   );
 };
 

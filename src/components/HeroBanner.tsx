@@ -29,8 +29,8 @@ const HeroBanner: React.FC = () => {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % movies.length);
         setFade(true);
-      }, 500);
-    }, 8000);
+      }, 400);
+    }, 4000);
     return () => clearInterval(interval);
   }, [movies]);
 
@@ -42,7 +42,7 @@ const HeroBanner: React.FC = () => {
     <section
       style={{
         position: 'relative',
-        height: '75vh',
+        height: '90vh',
         overflow: 'hidden',
         color: 'white',
         display: 'flex',
@@ -58,26 +58,12 @@ const HeroBanner: React.FC = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: fade ? 1 : 0,
-          transition: 'opacity 0.8s ease-in-out',
+          transition: 'opacity 0.6s ease-in-out',
           zIndex: 0,
         }}
       />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.85))',
-          zIndex: 1,
-        }}
-      />
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 2,
-          maxWidth: '800px',
-          padding: '60px',
-        }}
-      >
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.85))', zIndex: 1, }} />
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: '900px', padding: '60px', }}>
         <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '4rem', marginBottom: '20px' }}>
           {currentMovie.title}
         </h1>

@@ -131,9 +131,14 @@ const MovieList: React.FC<Props> = ({ title, category, movies: propMovies }) => 
           border-radius: 50%;
           cursor: pointer;
           margin-left: 10px;
+          background-color: rgba(0, 0, 0, 0.6); 
           transition: background-color 0.3s ease-in-out;
         }
 
+        .arrow-button-inline:hover {
+          background-color: rgba(255, 121, 0, 0.9); /* SURVOL EN ORANGE */
+        }
+              
         .arrow-button-inline:hover {
           background-color: #cc6300;
         }

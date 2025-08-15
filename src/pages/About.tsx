@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import maxImg from '../assets/max.png';
+import xavImg from '../assets/xav.png';
 
 const About: React.FC = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div style={{ padding: '80px 20px', backgroundColor: '#000', color: '#fff', minHeight: '100vh' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
@@ -24,30 +29,53 @@ const About: React.FC = () => {
         </h2>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap' }}>
+          {/* Maxime */}
           <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '120px',
-              height: '160px',
-              backgroundColor: '#1c1c1c',
-              borderRadius: '10px',
-              marginBottom: '10px'
-            }} />
+            <img
+              src={maxImg}
+              alt="Maxime Morissette"
+              style={{
+                width: '220px',
+                height: '260px',
+                borderRadius: '10px',
+                objectFit: 'cover',
+                marginBottom: '10px'
+              }}
+            />
             <div style={{ fontWeight: 'bold' }}>Maxime Morissette</div>
             <div style={{ color: '#ccc' }}>UX/UI Designer</div>
           </div>
 
+          {/* Xavier */}
           <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '120px',
-              height: '160px',
-              backgroundColor: '#1c1c1c',
-              borderRadius: '10px',
-              marginBottom: '10px'
-            }} />
+            <img
+              src={xavImg}
+              alt="Xavier Arguin"
+              style={{
+                width: '220px',
+                height: '260px',
+                borderRadius: '10px',
+                objectFit: 'cover',
+                marginBottom: '10px'
+              }}
+            />
             <div style={{ fontWeight: 'bold' }}>Xavier Arguin</div>
-            <div style={{ color: '#ccc' }}>Développeur</div>
+            <div style={{ color: '#ccc' }}>Développeur / Programmeur</div>
           </div>
         </div>
+
+        {/* Mention IA */}
+        <p style={{
+          fontSize: '0.95rem',
+          color: '#888',
+          marginTop: '40px',
+          maxWidth: '700px',
+          marginInline: 'auto',
+          fontStyle: 'italic'
+        }}>
+          Les images des membres de l’équipe présentées ci-dessus ont été générées à l’aide d’une intelligence artificielle.
+          Elles ont été créées dans un souci de confidentialité et de protection de notre identité personnelle.
+        </p>
       </div>
     </div>
   );

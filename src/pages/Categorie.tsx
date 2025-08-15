@@ -21,7 +21,8 @@ const Categorie: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
+  
+  
   useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true);

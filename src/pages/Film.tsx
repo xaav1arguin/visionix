@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Card } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   fetchTMDBMovie,
   fetchTMDBCredits,
@@ -17,6 +17,10 @@ const Film: React.FC = () => {
   const [recommendedMovies, setRecommendedMovies] = useState<TMDBMoviesByGenreResponse['results']>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
@@ -143,26 +147,39 @@ const Film: React.FC = () => {
           </h3>
           <div style={{ display: 'flex', overflowX: 'auto', gap: '1rem', paddingBottom: '1rem' }}>
             {cast.map((actor) => (
-              <Card
+              <Link
+                to={`/acteur/${actor.id}`}
                 key={actor.id}
-                bg="dark"
-                text="light"
-                style={{ minWidth: '140px', maxWidth: '140px', flex: '0 0 auto', border: '1px solid #333' }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <Card.Img
-                  variant="top"
-                  src={
-                    actor.profile_path
-                      ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
-                      : '../public/placeholder.png'
-                  }
-                  style={{ height: '210px', objectFit: 'cover' }}
-                />
-                <Card.Body style={{ padding: '0.5rem' }}>
-                  <Card.Title style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>{actor.name}</Card.Title>
-                  <Card.Text style={{ fontSize: '0.75rem', color: '#bbb' }}>{actor.character}</Card.Text>
-                </Card.Body>
-              </Card>
+                <Card
+                  bg="dark"
+                  text="light"
+                  style={{
+                    width: '180px',
+                    minHeight: '350px',
+                    flex: '0 0 auto',
+                    border: '1px solid #333',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Card.Img
+                    variant="top"
+                    src={
+                      actor.profile_path
+                        ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                        : '/placeholder.png'
+                    }
+                    style={{ height: '270px', objectFit: 'cover' }}
+                  />
+                  <Card.Body style={{ padding: '0.5rem' }}>
+                    <Card.Title style={{ fontSize: '0.9rem', flexGrow: 1, marginBottom: '0.3rem' }}>{actor.name}</Card.Title>
+                    <Card.Text style={{ fontSize: '0.75rem', color: '#bbb' }}>{actor.character}</Card.Text>
+                  </Card.Body>
+                </Card>
+              </Link>
             ))}
           </div>
         </Container>
@@ -176,28 +193,44 @@ const Film: React.FC = () => {
           </h3>
           <div style={{ display: 'flex', overflowX: 'auto', gap: '1rem', paddingBottom: '1rem' }}>
             {recommendedMovies.map((film) => (
-              <Card
+              <Link
+                to={`/film/${film.id}`}
                 key={film.id}
-                bg="dark"
-                text="light"
-                style={{ minWidth: '140px', maxWidth: '140px', flex: '0 0 auto', border: '1px solid #333' }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <Card.Img
-                  variant="top"
-                  src={
-                    film.poster_path
-                      ? `https://image.tmdb.org/t/p/w185${film.poster_path}`
-                      : '../public/placeholder.png'
-                  }
-                  style={{ height: '210px', objectFit: 'cover' }}
-                />
-                <Card.Body style={{ padding: '0.5rem' }}>
-                  <Card.Title style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>{film.title}</Card.Title>
-                  <Card.Text style={{ fontSize: '0.75rem', color: '#bbb' }}>
-                    {new Date(film.release_date).getFullYear()}
-                  </Card.Text>
-                </Card.Body>
-              </Card>
+                <Card
+                  bg="dark"
+                  text="light"
+                  style={{
+                    width: '180px',
+                    minHeight: '370px',
+                    flex: '0 0 auto',
+                    border: '1px solid #333',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Card.Img
+                    variant="top"
+                    src={
+                      film.poster_path
+                        ? `https://image.tmdb.org/t/p/w185${film.poster_path}`
+                        : '/placeholder.png'
+                    }
+                    style={{ height: '270px', objectFit: 'cover' }}
+                  />
+                  <Card.Body style={{ padding: '0.5rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <Card.Title style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>
+                      {film.title}
+                    </Card.Title>
+                    <Card.Text style={{ fontSize: '0.75rem', color: '#bbb', marginTop: '0.5rem', marginBottom: 0 }}>
+                      {new Date(film.release_date).getFullYear()}
+                    </Card.Text>
+                  </Card.Body>
+
+                </Card>
+              </Link>
             ))}
           </div>
         </Container>

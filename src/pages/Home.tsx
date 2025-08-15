@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import HeroBanner from '../components/HeroBanner';
 import MovieList from '../components/MovieList';
 
 const Home: React.FC = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div style={{ backgroundColor: '#000', minHeight: '100vh' }}>
       <HeroBanner />
